@@ -143,6 +143,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "Fixed ObjectId serialization issue by properly formatting datetime objects in response. All CRUD operations now working: create, list, delete reminders"
+      - working: true
+        agent: "testing"
+        comment: "COMPREHENSIVE DELETION TEST PASSED: Created user deletetest@test.com, created 2 reminders (Test Person 1 & Test Person 2), successfully deleted first reminder, verified only second remains in list, confirmed reminder_count decremented from 2 to 1. Database correctly sets status='deleted' and list endpoint filters deleted reminders properly."
 
   - task: "User Profile and Plan Management"
     implemented: true
