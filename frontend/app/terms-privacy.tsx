@@ -68,12 +68,9 @@ export default function TermsPrivacyScreen() {
 
             <Text style={styles.sectionTitle}>4. Subscription Terms</Text>
             <Text style={styles.paragraph}>
-              {'\u2022'} Free Plan: Limited to 5 reminders per month{'
-'}
-              {'\u2022'} Premium Plan: Unlimited reminders with additional features{'
-'}
-              {'\u2022'} Subscriptions are billed monthly or quarterly{'
-'}
+              {'\u2022'} Free Plan: Limited to 5 reminders per month{'\n'}
+              {'\u2022'} Premium Plan: Unlimited reminders with additional features{'\n'}
+              {'\u2022'} Subscriptions are billed monthly or quarterly{'\n'}
               {'\u2022'} You may cancel at any time
             </Text>
 
