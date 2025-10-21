@@ -104,13 +104,13 @@ def create_token(user_id: str) -> str:
     return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
 def generate_referral_code() -> str:
-    \"\"\"Generate a unique 8-character referral code\"\"\"
+    """Generate a unique 8-character referral code"""
     import random
     import string
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
 
 async def check_and_reward_referrer(referrer_id: str):
-    \"\"\"Check if referrer has 5 referrals and reward them with premium\"\"\"
+    """Check if referrer has 5 referrals and reward them with premium"""
     referral_count = await db.users.count_documents({'referred_by': referrer_id})
     
     if referral_count >= 5:
