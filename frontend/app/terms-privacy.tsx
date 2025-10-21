@@ -87,13 +87,13 @@ export default function TermsPrivacyScreen() {
             <Text style={styles.paragraph}>
               You may not use CallMeBack:{'
 '}
-              • For any unlawful purpose{'
+              {'\u2022'} For any unlawful purpose{'
 '}
-              • To spam or harass others{'
+              {'\u2022'} To spam or harass others{'
 '}
-              • To violate any local, state, or international law{'
+              {'\u2022'} To violate any local, state, or international law{'
 '}
-              • To impersonate or attempt to impersonate another user
+              {'\u2022'} To impersonate or attempt to impersonate another user
             </Text>
 
             <Text style={styles.sectionTitle}>7. Limitation of Liability</Text>
