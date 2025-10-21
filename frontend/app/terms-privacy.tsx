@@ -164,16 +164,11 @@ export default function TermsPrivacyScreen() {
 
             <Text style={styles.sectionTitle}>8. Your Rights</Text>
             <Text style={styles.paragraph}>
-              You have the right to:{'
-'}
-              {'\u2022'} Access your personal data{'
-'}
-              {'\u2022'} Correct inaccurate data{'
-'}
-              {'\u2022'} Request deletion of your data{'
-'}
-              {'\u2022'} Object to data processing{'
-'}
+              You have the right to:{'\n'}
+              {'\u2022'} Access your personal data{'\n'}
+              {'\u2022'} Correct inaccurate data{'\n'}
+              {'\u2022'} Request deletion of your data{'\n'}
+              {'\u2022'} Object to data processing{'\n'}
               {'\u2022'} Data portability
             </Text>
 
