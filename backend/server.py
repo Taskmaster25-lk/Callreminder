@@ -158,6 +158,18 @@ async def register(user_data: UserCreate):
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
     
+    # Validate referral code if provided
+    referrer_id = None
+    if user_data.referral_code:
+        referrer = await db.users.find_one({'referral_code': user_data.referral_code})
+        if referrer:
+            referrer_id = str(referrer['_id'])
+    
+    # Generate unique referral code for new user
+    referral_code = generate_referral_code()
+    while await db.users.find_one({'referral_code': referral_code}):
+        referral_code = generate_referral_code()
+    
     # Create user
     user_doc = {
         'name': user_data.name,
@@ -166,11 +178,18 @@ async def register(user_data: UserCreate):
         'plan_type': 'free',
         'plan_expiry': None,
         'reminder_count': 0,
+        'referral_code': referral_code,
+        'referred_by': referrer_id,
+        'referral_reward_given': False,
         'created_at': datetime.utcnow()
     }
     
     result = await db.users.insert_one(user_doc)
     user_id = str(result.inserted_id)
+    
+    # Check if referrer should be rewarded
+    if referrer_id:
+        await check_and_reward_referrer(referrer_id)
     
     token = create_token(user_id)
     
@@ -181,7 +200,8 @@ async def register(user_data: UserCreate):
             'name': user_data.name,
             'email': user_data.email,
             'plan_type': 'free',
-            'reminder_count': 0
+            'reminder_count': 0,
+            'referral_code': referral_code
         }
     }
 
