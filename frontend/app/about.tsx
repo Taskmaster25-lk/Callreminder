@@ -116,7 +116,7 @@ export default function AboutScreen() {
 
         <View style={styles.acknowledgments}>
           <Text style={styles.sectionTitle}>Acknowledgments</Text>
-          <Text style={styles.acknowledg mentText}>
+          <Text style={styles.acknowledgmentText}>
             Thanks to all users who provide feedback and help make CallMeBack better every day.
             Special thanks to the open-source community for the amazing tools and libraries.
           </Text>
