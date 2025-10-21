@@ -122,13 +122,13 @@ export default function TermsPrivacyScreen() {
             <Text style={styles.paragraph}>
               We collect information that you provide directly to us:{'
 '}
-              • Account information (name, email, password){'
+              {'\u2022'} Account information (name, email, password){'
 '}
-              • Contact information for reminders{'
+              {'\u2022'} Contact information for reminders{'
 '}
-              • Usage data and preferences{'
+              {'\u2022'} Usage data and preferences{'
 '}
-              • Payment information (processed securely via Razorpay)
+              {'\u2022'} Payment information (processed securely via Razorpay)
             </Text>
 
             <Text style={styles.sectionTitle}>2. How We Use Your Information</Text>
