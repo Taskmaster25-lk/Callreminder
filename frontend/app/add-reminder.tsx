@@ -10,6 +10,7 @@ import {
   Platform,
   ScrollView,
   ActivityIndicator,
+  Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -17,6 +18,7 @@ import { router } from 'expo-router';
 import { useAuth } from './context/AuthContext';
 import Constants from 'expo-constants';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import * as Contacts from 'expo-contacts';
 
 const API_URL = Constants.expoConfig?.extra?.EXPO_PUBLIC_BACKEND_URL || process.env.EXPO_PUBLIC_BACKEND_URL;
 
@@ -25,9 +27,47 @@ export default function AddReminderScreen() {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [description, setDescription] = useState('');
-  const [date, setDate] = useState(new Date(Date.now() + 3600000)); // 1 hour from now
+  const [date, setDate] = useState(new Date(Date.now() + 3600000));
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showContactPicker, setShowContactPicker] = useState(false);
+  const [contacts, setContacts] = useState<any[]>([]);
+  const [loadingContacts, setLoadingContacts] = useState(false);
+
+  const loadContacts = async () => {
+    try {
+      setLoadingContacts(true);
+      const { status } = await Contacts.requestPermissionsAsync();
+      
+      if (status !== 'granted') {
+        Alert.alert('Permission Required', 'Please allow access to contacts');
+        return;
+      }
+
+      const { data } = await Contacts.getContactsAsync({
+        fields: [Contacts.Fields.PhoneNumbers, Contacts.Fields.Name],
+      });
+
+      if (data.length > 0) {
+        setContacts(data.filter(c => c.phoneNumbers && c.phoneNumbers.length > 0));
+        setShowContactPicker(true);
+      } else {
+        Alert.alert('No Contacts', 'No contacts found on your device');
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Could not load contacts');
+    } finally {
+      setLoadingContacts(false);
+    }
+  };
+
+  const selectContact = (contact: any) => {
+    setName(contact.name || 'Unknown');
+    if (contact.phoneNumbers && contact.phoneNumbers.length > 0) {
+      setPhone(contact.phoneNumbers[0].number || '');
+    }
+    setShowContactPicker(false);
+  };
 
   const handleSubmit = async () => {
     if (!name || !phone) {
@@ -101,6 +141,31 @@ export default function AddReminderScreen() {
           keyboardShouldPersistTaps="handled"
         >
           <View style={styles.form}>
+            <View style={styles.contactChoice}>
+              <Text style={styles.choiceTitle}>Choose Contact Method</Text>
+              <View style={styles.choiceButtons}>
+                <TouchableOpacity
+                  style={styles.choiceButton}
+                  onPress={loadContacts}
+                  disabled={loadingContacts}
+                >
+                  {loadingContacts ? (
+                    <ActivityIndicator color="#4F46E5" />
+                  ) : (
+                    <>
+                      <Ionicons name="people" size={24} color="#4F46E5" />
+                      <Text style={styles.choiceButtonText}>From Contacts</Text>
+                    </>
+                  )}
+                </TouchableOpacity>
+                <Text style={styles.orText}>OR</Text>
+                <View style={styles.manualLabel}>
+                  <Ionicons name="create" size={20} color="#6B7280" />
+                  <Text style={styles.manualLabelText}>Enter Manually Below</Text>
+                </View>
+              </View>
+            </View>
+
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Name to Call</Text>
               <View style={styles.inputContainer}>
@@ -189,6 +254,45 @@ export default function AddReminderScreen() {
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
+
+      {/* Contact Picker Modal */}
+      <Modal
+        visible={showContactPicker}
+        animationType="slide"
+        onRequestClose={() => setShowContactPicker(false)}
+      >
+        <SafeAreaView style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <TouchableOpacity onPress={() => setShowContactPicker(false)}>
+              <Ionicons name="close" size={28} color="#1F2937" />
+            </TouchableOpacity>
+            <Text style={styles.modalTitle}>Select Contact</Text>
+            <View style={styles.placeholder} />
+          </View>
+          <ScrollView style={styles.contactList}>
+            {contacts.map((contact, index) => (
+              <TouchableOpacity
+                key={index}
+                style={styles.contactItem}
+                onPress={() => selectContact(contact)}
+              >
+                <View style={styles.contactAvatar}>
+                  <Ionicons name="person" size={24} color="#4F46E5" />
+                </View>
+                <View style={styles.contactInfo}>
+                  <Text style={styles.contactName}>{contact.name || 'Unknown'}</Text>
+                  {contact.phoneNumbers && contact.phoneNumbers[0] && (
+                    <Text style={styles.contactPhone}>
+                      {contact.phoneNumbers[0].number}
+                    </Text>
+                  )}
+                </View>
+                <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </SafeAreaView>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -230,6 +334,51 @@ const styles = StyleSheet.create({
   },
   form: {
     gap: 20,
+  },
+  contactChoice: {
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 8,
+  },
+  choiceTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1F2937',
+    marginBottom: 12,
+  },
+  choiceButtons: {
+    gap: 12,
+  },
+  choiceButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#EEF2FF',
+    borderRadius: 12,
+    padding: 16,
+    gap: 8,
+  },
+  choiceButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#4F46E5',
+  },
+  orText: {
+    textAlign: 'center',
+    color: '#9CA3AF',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  manualLabel: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  manualLabelText: {
+    fontSize: 14,
+    color: '#6B7280',
   },
   inputGroup: {
     gap: 8,
@@ -293,5 +442,58 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 16,
     fontWeight: '600',
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: '#F9FAFB',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    backgroundColor: '#ffffff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#1F2937',
+  },
+  contactList: {
+    flex: 1,
+  },
+  contactItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#ffffff',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+  },
+  contactAvatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#EEF2FF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  contactInfo: {
+    flex: 1,
+  },
+  contactName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1F2937',
+    marginBottom: 2,
+  },
+  contactPhone: {
+    fontSize: 14,
+    color: '#6B7280',
   },
 });
