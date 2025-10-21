@@ -182,15 +182,15 @@ export default function TermsPrivacyScreen() {
             <Text style={styles.paragraph}>
               You have the right to:{'
 '}
-              • Access your personal data{'
+              {'\u2022'} Access your personal data{'
 '}
-              • Correct inaccurate data{'
+              {'\u2022'} Correct inaccurate data{'
 '}
-              • Request deletion of your data{'
+              {'\u2022'} Request deletion of your data{'
 '}
-              • Object to data processing{'
+              {'\u2022'} Object to data processing{'
 '}
-              • Data portability
+              {'\u2022'} Data portability
             </Text>
 
             <Text style={styles.sectionTitle}>9. Children's Privacy</Text>
