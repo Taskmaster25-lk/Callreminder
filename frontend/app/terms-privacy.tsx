@@ -82,14 +82,10 @@ export default function TermsPrivacyScreen() {
 
             <Text style={styles.sectionTitle}>6. Prohibited Uses</Text>
             <Text style={styles.paragraph}>
-              You may not use CallMeBack:{'
-'}
-              {'\u2022'} For any unlawful purpose{'
-'}
-              {'\u2022'} To spam or harass others{'
-'}
-              {'\u2022'} To violate any local, state, or international law{'
-'}
+              You may not use CallMeBack:{'\n'}
+              {'\u2022'} For any unlawful purpose{'\n'}
+              {'\u2022'} To spam or harass others{'\n'}
+              {'\u2022'} To violate any local, state, or international law{'\n'}
               {'\u2022'} To impersonate or attempt to impersonate another user
             </Text>
 
