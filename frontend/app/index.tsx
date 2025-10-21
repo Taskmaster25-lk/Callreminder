@@ -22,11 +22,9 @@ export default function SplashScreen() {
     <View style={styles.container}>
       <View style={styles.logoContainer}>
         <View style={styles.logoCircle}>
-          <Image
-            source={require('../assets/icon.png')}
-            style={styles.logo}
-          />
+          <Ionicons name="call" size={60} color="#4F46E5" />
         </View>
+        <Text style={styles.appName}>CallMeBack</Text>
         <ActivityIndicator size="large" color="#4F46E5" style={styles.loader} />
       </View>
     </View>
