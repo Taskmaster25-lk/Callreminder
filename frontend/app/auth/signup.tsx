@@ -20,13 +20,14 @@ export default function SignupScreen() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [referralCode, setReferralCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const { signup } = useAuth();
 
   const handleSignup = async () => {
     if (!name || !email || !password) {
-      Alert.alert('Error', 'Please fill in all fields');
+      Alert.alert('Error', 'Please fill in all required fields');
       return;
     }
 
@@ -37,7 +38,7 @@ export default function SignupScreen() {
 
     setLoading(true);
     try {
-      await signup(name.trim(), email.toLowerCase().trim(), password);
+      await signup(name.trim(), email.toLowerCase().trim(), password, referralCode.trim());
       router.replace('/(tabs)/home');
     } catch (error: any) {
       Alert.alert('Signup Failed', error.message || 'Could not create account');
@@ -77,6 +78,7 @@ export default function SignupScreen() {
                 value={name}
                 onChangeText={setName}
                 placeholderTextColor="#9CA3AF"
+                autoCapitalize="words"
               />
             </View>
 
@@ -107,6 +109,27 @@ export default function SignupScreen() {
                 <Ionicons name={showPassword ? "eye-outline" : "eye-off-outline"} size={20} color="#9CA3AF" />
               </TouchableOpacity>
             </View>
+
+            <View style={styles.inputContainer}>
+              <Ionicons name="gift-outline" size={20} color="#9CA3AF" style={styles.inputIcon} />
+              <TextInput
+                style={styles.input}
+                placeholder="Referral Code (Optional)"
+                value={referralCode}
+                onChangeText={setReferralCode}
+                autoCapitalize="characters"
+                placeholderTextColor="#9CA3AF"
+              />
+            </View>
+
+            {referralCode.length > 0 && (
+              <View style={styles.referralInfo}>
+                <Ionicons name="information-circle" size={16} color="#10B981" />
+                <Text style={styles.referralInfoText}>
+                  You'll help your friend earn Premium rewards!
+                </Text>
+              </View>
+            )}
 
             <TouchableOpacity
               style={[styles.button, loading && styles.buttonDisabled]}
@@ -199,6 +222,20 @@ const styles = StyleSheet.create({
   },
   eyeIcon: {
     padding: 8,
+  },
+  referralInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#D1FAE5',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+    gap: 8,
+  },
+  referralInfoText: {
+    flex: 1,
+    fontSize: 13,
+    color: '#065F46',
   },
   button: {
     backgroundColor: '#4F46E5',
