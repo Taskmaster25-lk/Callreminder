@@ -113,40 +113,28 @@ export default function TermsPrivacyScreen() {
 
             <Text style={styles.sectionTitle}>1. Information We Collect</Text>
             <Text style={styles.paragraph}>
-              We collect information that you provide directly to us:{'
-'}
-              {'\u2022'} Account information (name, email, password){'
-'}
-              {'\u2022'} Contact information for reminders{'
-'}
-              {'\u2022'} Usage data and preferences{'
-'}
+              We collect information that you provide directly to us:{'\n'}
+              {'\u2022'} Account information (name, email, password){'\n'}
+              {'\u2022'} Contact information for reminders{'\n'}
+              {'\u2022'} Usage data and preferences{'\n'}
               {'\u2022'} Payment information (processed securely via Razorpay)
             </Text>
 
             <Text style={styles.sectionTitle}>2. How We Use Your Information</Text>
             <Text style={styles.paragraph}>
-              We use the information we collect to:{'
-'}
-              {'\u2022'} Provide and maintain CallMeBack{'
-'}
-              {'\u2022'} Send you reminder notifications{'
-'}
-              {'\u2022'} Process your transactions{'
-'}
-              {'\u2022'} Improve our services{'
-'}
+              We use the information we collect to:{'\n'}
+              {'\u2022'} Provide and maintain CallMeBack{'\n'}
+              {'\u2022'} Send you reminder notifications{'\n'}
+              {'\u2022'} Process your transactions{'\n'}
+              {'\u2022'} Improve our services{'\n'}
               {'\u2022'} Communicate with you about updates and support
             </Text>
 
             <Text style={styles.sectionTitle}>3. Information Sharing</Text>
             <Text style={styles.paragraph}>
-              We do not sell or rent your personal information. We may share information:{'
-'}
-              {'\u2022'} With service providers (payment processing, hosting){'
-'}
-              {'\u2022'} When required by law{'
-'}
+              We do not sell or rent your personal information. We may share information:{'\n'}
+              {'\u2022'} With service providers (payment processing, hosting){'\n'}
+              {'\u2022'} When required by law{'\n'}
               {'\u2022'} To protect our rights and safety
             </Text>
 
