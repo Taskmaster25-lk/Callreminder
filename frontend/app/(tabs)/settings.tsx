@@ -104,7 +104,10 @@ export default function SettingsScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Support</Text>
           
-          <TouchableOpacity style={styles.menuItem}>
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => router.push('/help-support')}
+          >
             <View style={styles.menuIconContainer}>
               <Ionicons name="help-circle-outline" size={20} color="#4F46E5" />
             </View>
@@ -112,7 +115,10 @@ export default function SettingsScreen() {
             <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem}>
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => router.push('/terms-privacy')}
+          >
             <View style={styles.menuIconContainer}>
               <Ionicons name="document-text-outline" size={20} color="#4F46E5" />
             </View>
@@ -120,11 +126,34 @@ export default function SettingsScreen() {
             <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem}>
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => router.push('/about')}
+          >
             <View style={styles.menuIconContainer}>
               <Ionicons name="information-circle-outline" size={20} color="#4F46E5" />
             </View>
             <Text style={styles.menuText}>About</Text>
+            <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={async () => {
+              try {
+                await Share.share({
+                  message: 'Check out CallMeBack - Never miss an important call! Get smart call reminders. Download now!',
+                  title: 'CallMeBack App'
+                });
+              } catch (error) {
+                console.error('Error sharing:', error);
+              }
+            }}
+          >
+            <View style={styles.menuIconContainer}>
+              <Ionicons name="share-social-outline" size={20} color="#4F46E5" />
+            </View>
+            <Text style={styles.menuText}>Share App</Text>
             <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
           </TouchableOpacity>
         </View>
