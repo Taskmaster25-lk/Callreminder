@@ -263,8 +263,13 @@ async def create_reminder(reminder_data: ReminderCreate, current_user = Depends(
     
     return {
         'id': str(result.inserted_id),
-        **reminder_doc,
-        'user_id': user_id
+        'user_id': user_id,
+        'name_to_call': reminder_doc['name_to_call'],
+        'phone_number': reminder_doc['phone_number'],
+        'description': reminder_doc['description'],
+        'date_time': reminder_doc['date_time'].isoformat(),
+        'status': reminder_doc['status'],
+        'created_at': reminder_doc['created_at'].isoformat()
     }
 
 @api_router.get("/reminders/list")
