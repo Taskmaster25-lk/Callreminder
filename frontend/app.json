@@ -22,8 +22,16 @@
         "CALL_PHONE",
         "RECEIVE_BOOT_COMPLETED",
         "SCHEDULE_EXACT_ALARM",
-        "POST_NOTIFICATIONS"
+        "POST_NOTIFICATIONS",
+        "READ_CONTACTS"
       ]
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.callmeback.app",
+      "infoPlist": {
+        "NSContactsUsageDescription": "CallMeBack needs access to your contacts to help you quickly select people to call."
+      }
     },
     "notification": {
       "icon": "./assets/images/icon.png",
