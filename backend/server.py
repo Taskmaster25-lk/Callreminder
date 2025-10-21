@@ -103,6 +103,33 @@ def create_token(user_id: str) -> str:
     }
     return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
+def generate_referral_code() -> str:
+    \"\"\"Generate a unique 8-character referral code\"\"\"
+    import random
+    import string
+    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+
+async def check_and_reward_referrer(referrer_id: str):
+    \"\"\"Check if referrer has 5 referrals and reward them with premium\"\"\"
+    referral_count = await db.users.count_documents({'referred_by': referrer_id})
+    
+    if referral_count >= 5:
+        # Check if already rewarded
+        referrer = await db.users.find_one({'_id': ObjectId(referrer_id)})
+        if referrer and referrer.get('referral_reward_given') != True:
+            # Give 15 days of premium
+            expiry_date = datetime.utcnow() + timedelta(days=15)
+            await db.users.update_one(
+                {'_id': ObjectId(referrer_id)},
+                {'$set': {
+                    'plan_type': 'premium',
+                    'plan_expiry': expiry_date,
+                    'referral_reward_given': True
+                }}
+            )
+            return True
+    return False
+
 async def get_current_user(authorization: str = Header(None)):
     if not authorization:
         raise HTTPException(status_code=401, detail="Authorization header missing")
