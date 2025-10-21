@@ -132,15 +132,15 @@ export default function TermsPrivacyScreen() {
             <Text style={styles.paragraph}>
               We use the information we collect to:{'
 '}
-              • Provide and maintain CallMeBack{'
+              {'\u2022'} Provide and maintain CallMeBack{'
 '}
-              • Send you reminder notifications{'
+              {'\u2022'} Send you reminder notifications{'
 '}
-              • Process your transactions{'
+              {'\u2022'} Process your transactions{'
 '}
-              • Improve our services{'
+              {'\u2022'} Improve our services{'
 '}
-              • Communicate with you about updates and support
+              {'\u2022'} Communicate with you about updates and support
             </Text>
 
             <Text style={styles.sectionTitle}>3. Information Sharing</Text>
