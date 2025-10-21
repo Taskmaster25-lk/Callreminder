@@ -62,7 +62,10 @@ export default function SettingsScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Account</Text>
           
-          <TouchableOpacity style={styles.menuItem}>
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => router.push('/edit-profile')}
+          >
             <View style={styles.menuIconContainer}>
               <Ionicons name="person-outline" size={20} color="#4F46E5" />
             </View>
@@ -85,19 +88,14 @@ export default function SettingsScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Notifications</Text>
           
-          <TouchableOpacity style={styles.menuItem}>
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => router.push('/notification-settings')}
+          >
             <View style={styles.menuIconContainer}>
               <Ionicons name="notifications-outline" size={20} color="#4F46E5" />
             </View>
             <Text style={styles.menuText}>Notification Settings</Text>
-            <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.menuItem}>
-            <View style={styles.menuIconContainer}>
-              <Ionicons name="volume-high-outline" size={20} color="#4F46E5" />
-            </View>
-            <Text style={styles.menuText}>Ringtone & Sounds</Text>
             <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
           </TouchableOpacity>
         </View>
