@@ -470,6 +470,37 @@ async def get_profile(current_user = Depends(get_current_user)):
         'reminder_count': current_user.get('reminder_count', 0)
     }
 
+# ==================== REFERRAL ENDPOINTS ====================
+
+@api_router.get("/referral/stats")
+async def get_referral_stats(current_user = Depends(get_current_user)):
+    user_id = str(current_user['_id'])
+    
+    # Get referrals made by this user
+    referrals = await db.users.find(
+        {'referred_by': user_id},
+        {'name': 1, 'email': 1, 'created_at': 1}
+    ).to_list(100)
+    
+    referral_list = [{
+        'name': r['name'],
+        'email': r['email'],
+        'created_at': r['created_at'].isoformat()
+    } for r in referrals]
+    
+    return {
+        'referral_code': current_user.get('referral_code', ''),
+        'referrals_count': len(referral_list),
+        'referrals': referral_list
+    }
+
+@api_router.post("/referral/validate")
+async def validate_referral_code(referral_code: str):
+    user = await db.users.find_one({'referral_code': referral_code})
+    if user:
+        return {'valid': True, 'referrer_name': user['name']}
+    return {'valid': False}
+
 # ==================== HEALTH CHECK ====================
 
 @api_router.get("/")
