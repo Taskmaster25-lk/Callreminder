@@ -51,9 +51,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 24,
   },
-  logo: {
-    width: 80,
-    height: 80,
+  appName: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#1F2937',
+    marginBottom: 8,
   },
   loader: {
     marginTop: 16,
