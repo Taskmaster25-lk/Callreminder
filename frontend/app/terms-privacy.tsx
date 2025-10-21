@@ -147,11 +147,11 @@ export default function TermsPrivacyScreen() {
             <Text style={styles.paragraph}>
               We do not sell or rent your personal information. We may share information:{'
 '}
-              • With service providers (payment processing, hosting){'
+              {'\u2022'} With service providers (payment processing, hosting){'
 '}
-              • When required by law{'
+              {'\u2022'} When required by law{'
 '}
-              • To protect our rights and safety
+              {'\u2022'} To protect our rights and safety
             </Text>
 
             <Text style={styles.sectionTitle}>4. Data Security</Text>
