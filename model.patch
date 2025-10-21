@@ -1,370 +1,397 @@
-diff --git a/frontend/app/(tabs)/settings.tsx b/frontend/app/(tabs)/settings.tsx
-index 21b4524..46b43e0 100644
---- a/frontend/app/(tabs)/settings.tsx
-+++ b/frontend/app/(tabs)/settings.tsx
-@@ -6,6 +6,7 @@ import {
-   TouchableOpacity,
-   ScrollView,
-   Alert,
-+  Share,
- } from 'react-native';
- import { SafeAreaView } from 'react-native-safe-area-context';
- import { Ionicons } from '@expo/vector-icons';
-@@ -103,7 +104,10 @@ export default function SettingsScreen() {
-         <View style={styles.section}>
-           <Text style={styles.sectionTitle}>Support</Text>
-           
--          <TouchableOpacity style={styles.menuItem}>
-+          <TouchableOpacity
-+            style={styles.menuItem}
-+            onPress={() => router.push('/help-support')}
-+          >
-             <View style={styles.menuIconContainer}>
-               <Ionicons name="help-circle-outline" size={20} color="#4F46E5" />
-             </View>
-@@ -111,7 +115,10 @@ export default function SettingsScreen() {
-             <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
-           </TouchableOpacity>
+diff --git a/frontend/app/terms-privacy.tsx b/frontend/app/terms-privacy.tsx
+index 76af04d..a7af7f3 100644
+--- a/frontend/app/terms-privacy.tsx
++++ b/frontend/app/terms-privacy.tsx
+@@ -68,13 +68,13 @@ export default function TermsPrivacyScreen() {
  
--          <TouchableOpacity style={styles.menuItem}>
-+          <TouchableOpacity
-+            style={styles.menuItem}
-+            onPress={() => router.push('/terms-privacy')}
-+          >
-             <View style={styles.menuIconContainer}>
-               <Ionicons name="document-text-outline" size={20} color="#4F46E5" />
-             </View>
-@@ -119,13 +126,36 @@ export default function SettingsScreen() {
-             <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
-           </TouchableOpacity>
+             <Text style={styles.sectionTitle}>4. Subscription Terms</Text>
+             <Text style={styles.paragraph}>
+-              • Free Plan: Limited to 5 reminders per month{'
++              {'\u2022'} Free Plan: Limited to 5 reminders per month{'
+ '}
+-              • Premium Plan: Unlimited reminders with additional features{'
++              {'\u2022'} Premium Plan: Unlimited reminders with additional features{'
+ '}
+-              • Subscriptions are billed monthly or quarterly{'
++              {'\u2022'} Subscriptions are billed monthly or quarterly{'
+ '}
+-              • You may cancel at any time
++              {'\u2022'} You may cancel at any time
+             </Text>
  
--          <TouchableOpacity style={styles.menuItem}>
-+          <TouchableOpacity
-+            style={styles.menuItem}
-+            onPress={() => router.push('/about')}
-+          >
-             <View style={styles.menuIconContainer}>
-               <Ionicons name="information-circle-outline" size={20} color="#4F46E5" />
-             </View>
-             <Text style={styles.menuText}>About</Text>
-             <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
-           </TouchableOpacity>
-+
-+          <TouchableOpacity
-+            style={styles.menuItem}
-+            onPress={async () => {
-+              try {
-+                await Share.share({
-+                  message: 'Check out CallMeBack - Never miss an important call! Get smart call reminders. Download now!',
-+                  title: 'CallMeBack App'
-+                });
-+              } catch (error) {
-+                console.error('Error sharing:', error);
-+              }
-+            }}
-+          >
-+            <View style={styles.menuIconContainer}>
-+              <Ionicons name="share-social-outline" size={20} color="#4F46E5" />
-+            </View>
-+            <Text style={styles.menuText}>Share App</Text>
-+            <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
-+          </TouchableOpacity>
-         </View>
- 
-         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+             <Text style={styles.sectionTitle}>5. Refund Policy</Text>
 diff --git a/model.patch b/model.patch
-index 37fd51b..e69de29 100644
+index a53adb1..e69de29 100644
 --- a/model.patch
 +++ b/model.patch
-@@ -1,291 +0,0 @@
--diff --git a/frontend/app/about.tsx b/frontend/app/about.tsx
--index 9edd44d..265b930 100644
----- a/frontend/app/about.tsx
--+++ b/frontend/app/about.tsx
--@@ -116,7 +116,7 @@ export default function AboutScreen() {
+@@ -1,370 +0,0 @@
+-diff --git a/frontend/app/(tabs)/settings.tsx b/frontend/app/(tabs)/settings.tsx
+-index 21b4524..46b43e0 100644
+---- a/frontend/app/(tabs)/settings.tsx
+-+++ b/frontend/app/(tabs)/settings.tsx
+-@@ -6,6 +6,7 @@ import {
+-   TouchableOpacity,
+-   ScrollView,
+-   Alert,
+-+  Share,
+- } from 'react-native';
+- import { SafeAreaView } from 'react-native-safe-area-context';
+- import { Ionicons } from '@expo/vector-icons';
+-@@ -103,7 +104,10 @@ export default function SettingsScreen() {
+-         <View style={styles.section}>
+-           <Text style={styles.sectionTitle}>Support</Text>
+-           
+--          <TouchableOpacity style={styles.menuItem}>
+-+          <TouchableOpacity
+-+            style={styles.menuItem}
+-+            onPress={() => router.push('/help-support')}
+-+          >
+-             <View style={styles.menuIconContainer}>
+-               <Ionicons name="help-circle-outline" size={20} color="#4F46E5" />
+-             </View>
+-@@ -111,7 +115,10 @@ export default function SettingsScreen() {
+-             <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+-           </TouchableOpacity>
 - 
--         <View style={styles.acknowledgments}>
--           <Text style={styles.sectionTitle}>Acknowledgments</Text>
---          <Text style={styles.acknowledg mentText}>
--+          <Text style={styles.acknowledgmentText}>
--             Thanks to all users who provide feedback and help make CallMeBack better every day.
--             Special thanks to the open-source community for the amazing tools and libraries.
--           </Text>
+--          <TouchableOpacity style={styles.menuItem}>
+-+          <TouchableOpacity
+-+            style={styles.menuItem}
+-+            onPress={() => router.push('/terms-privacy')}
+-+          >
+-             <View style={styles.menuIconContainer}>
+-               <Ionicons name="document-text-outline" size={20} color="#4F46E5" />
+-             </View>
+-@@ -119,13 +126,36 @@ export default function SettingsScreen() {
+-             <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+-           </TouchableOpacity>
+- 
+--          <TouchableOpacity style={styles.menuItem}>
+-+          <TouchableOpacity
+-+            style={styles.menuItem}
+-+            onPress={() => router.push('/about')}
+-+          >
+-             <View style={styles.menuIconContainer}>
+-               <Ionicons name="information-circle-outline" size={20} color="#4F46E5" />
+-             </View>
+-             <Text style={styles.menuText}>About</Text>
+-             <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+-           </TouchableOpacity>
+-+
+-+          <TouchableOpacity
+-+            style={styles.menuItem}
+-+            onPress={async () => {
+-+              try {
+-+                await Share.share({
+-+                  message: 'Check out CallMeBack - Never miss an important call! Get smart call reminders. Download now!',
+-+                  title: 'CallMeBack App'
+-+                });
+-+              } catch (error) {
+-+                console.error('Error sharing:', error);
+-+              }
+-+            }}
+-+          >
+-+            <View style={styles.menuIconContainer}>
+-+              <Ionicons name="share-social-outline" size={20} color="#4F46E5" />
+-+            </View>
+-+            <Text style={styles.menuText}>Share App</Text>
+-+            <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+-+          </TouchableOpacity>
+-         </View>
+- 
+-         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
 -diff --git a/model.patch b/model.patch
--index 9fb7876..e69de29 100644
+-index 37fd51b..e69de29 100644
 ---- a/model.patch
 -+++ b/model.patch
--@@ -1,273 +0,0 @@
+-@@ -1,291 +0,0 @@
+--diff --git a/frontend/app/about.tsx b/frontend/app/about.tsx
+--index 9edd44d..265b930 100644
+----- a/frontend/app/about.tsx
+--+++ b/frontend/app/about.tsx
+--@@ -116,7 +116,7 @@ export default function AboutScreen() {
+-- 
+--         <View style={styles.acknowledgments}>
+--           <Text style={styles.sectionTitle}>Acknowledgments</Text>
+---          <Text style={styles.acknowledg mentText}>
+--+          <Text style={styles.acknowledgmentText}>
+--             Thanks to all users who provide feedback and help make CallMeBack better every day.
+--             Special thanks to the open-source community for the amazing tools and libraries.
+--           </Text>
 --diff --git a/model.patch b/model.patch
---index 7ff6e72..e69de29 100644
+--index 9fb7876..e69de29 100644
 ----- a/model.patch
 --+++ b/model.patch
---@@ -1,268 +0,0 @@
----diff --git a/frontend/app/(tabs)/settings.tsx b/frontend/app/(tabs)/settings.tsx
----index d35a396..21b4524 100644
------- a/frontend/app/(tabs)/settings.tsx
----+++ b/frontend/app/(tabs)/settings.tsx
----@@ -62,7 +62,10 @@ export default function SettingsScreen() {
----         <View style={styles.section}>
----           <Text style={styles.sectionTitle}>Account</Text>
----           
-----          <TouchableOpacity style={styles.menuItem}>
----+          <TouchableOpacity
----+            style={styles.menuItem}
----+            onPress={() => router.push('/edit-profile')}
----+          >
----             <View style={styles.menuIconContainer}>
----               <Ionicons name="person-outline" size={20} color="#4F46E5" />
----             </View>
----@@ -85,21 +88,16 @@ export default function SettingsScreen() {
----         <View style={styles.section}>
----           <Text style={styles.sectionTitle}>Notifications</Text>
----           
-----          <TouchableOpacity style={styles.menuItem}>
----+          <TouchableOpacity
----+            style={styles.menuItem}
----+            onPress={() => router.push('/notification-settings')}
----+          >
----             <View style={styles.menuIconContainer}>
----               <Ionicons name="notifications-outline" size={20} color="#4F46E5" />
----             </View>
----             <Text style={styles.menuText}>Notification Settings</Text>
----             <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
----           </TouchableOpacity>
-----
-----          <TouchableOpacity style={styles.menuItem}>
-----            <View style={styles.menuIconContainer}>
-----              <Ionicons name="volume-high-outline" size={20} color="#4F46E5" />
-----            </View>
-----            <Text style={styles.menuText}>Ringtone & Sounds</Text>
-----            <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
-----          </TouchableOpacity>
----         </View>
---- 
----         <View style={styles.section}>
+--@@ -1,273 +0,0 @@
 ---diff --git a/model.patch b/model.patch
----index 7213120..e69de29 100644
+---index 7ff6e72..e69de29 100644
 ------ a/model.patch
 ---+++ b/model.patch
----@@ -1,221 +0,0 @@
-----diff --git a/backend/server.py b/backend/server.py
-----index b871bcc..ab371a1 100644
-------- a/backend/server.py
-----+++ b/backend/server.py
-----@@ -263,8 +263,13 @@ async def create_reminder(reminder_data: ReminderCreate, current_user = Depends(
-----     
-----     return {
-----         'id': str(result.inserted_id),
------        **reminder_doc,
------        'user_id': user_id
-----+        'user_id': user_id,
-----+        'name_to_call': reminder_doc['name_to_call'],
-----+        'phone_number': reminder_doc['phone_number'],
-----+        'description': reminder_doc['description'],
-----+        'date_time': reminder_doc['date_time'].isoformat(),
-----+        'status': reminder_doc['status'],
-----+        'created_at': reminder_doc['created_at'].isoformat()
-----     }
+---@@ -1,268 +0,0 @@
+----diff --git a/frontend/app/(tabs)/settings.tsx b/frontend/app/(tabs)/settings.tsx
+----index d35a396..21b4524 100644
+------- a/frontend/app/(tabs)/settings.tsx
+----+++ b/frontend/app/(tabs)/settings.tsx
+----@@ -62,7 +62,10 @@ export default function SettingsScreen() {
+----         <View style={styles.section}>
+----           <Text style={styles.sectionTitle}>Account</Text>
+----           
+-----          <TouchableOpacity style={styles.menuItem}>
+----+          <TouchableOpacity
+----+            style={styles.menuItem}
+----+            onPress={() => router.push('/edit-profile')}
+----+          >
+----             <View style={styles.menuIconContainer}>
+----               <Ionicons name="person-outline" size={20} color="#4F46E5" />
+----             </View>
+----@@ -85,21 +88,16 @@ export default function SettingsScreen() {
+----         <View style={styles.section}>
+----           <Text style={styles.sectionTitle}>Notifications</Text>
+----           
+-----          <TouchableOpacity style={styles.menuItem}>
+----+          <TouchableOpacity
+----+            style={styles.menuItem}
+----+            onPress={() => router.push('/notification-settings')}
+----+          >
+----             <View style={styles.menuIconContainer}>
+----               <Ionicons name="notifications-outline" size={20} color="#4F46E5" />
+----             </View>
+----             <Text style={styles.menuText}>Notification Settings</Text>
+----             <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+----           </TouchableOpacity>
+-----
+-----          <TouchableOpacity style={styles.menuItem}>
+-----            <View style={styles.menuIconContainer}>
+-----              <Ionicons name="volume-high-outline" size={20} color="#4F46E5" />
+-----            </View>
+-----            <Text style={styles.menuText}>Ringtone & Sounds</Text>
+-----            <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+-----          </TouchableOpacity>
+----         </View>
 ---- 
----- @api_router.get("/reminders/list")
-----diff --git a/free_user_limit_test.py b/free_user_limit_test.py
-----new file mode 100644
-----index 0000000..4cc70a9
-------- /dev/null
-----+++ b/free_user_limit_test.py
-----@@ -0,0 +1,72 @@
-----+#!/usr/bin/env python3
-----+"""
-----+Test free user reminder limit (5 reminders max)
-----+"""
-----+
-----+import requests
-----+import json
-----+from datetime import datetime, timedelta
-----+import uuid
-----+
-----+BACKEND_URL = "https://reminders-app.preview.emergentagent.com/api"
-----+
-----+def test_free_user_limit():
-----+    # Create a new user for this test
-----+    user_data = {
-----+        "name": "Free User Test",
-----+        "email": f"freeuser{uuid.uuid4().hex[:8]}@example.com",
-----+        "password": "test123"
-----+    }
-----+    
-----+    # Register user
-----+    response = requests.post(f"{BACKEND_URL}/auth/register", json=user_data)
-----+    if response.status_code != 200:
-----+        print(f"❌ Registration failed: {response.text}")
-----+        return False
-----+    
-----+    token = response.json()["token"]
-----+    headers = {"Authorization": f"Bearer {token}"}
-----+    
-----+    print(f"✅ Created free user: {user_data['email']}")
-----+    
-----+    # Create 5 reminders (should all succeed)
-----+    reminder_ids = []
-----+    for i in range(5):
-----+        reminder_data = {
-----+            "name_to_call": f"Contact {i+1}",
-----+            "phone_number": f"+123456789{i}",
-----+            "description": f"Test reminder {i+1}",
-----+            "date_time": (datetime.utcnow() + timedelta(hours=i+1)).isoformat()
-----+        }
-----+        
-----+        response = requests.post(f"{BACKEND_URL}/reminders/create", json=reminder_data, headers=headers)
-----+        if response.status_code == 200:
-----+            reminder_ids.append(response.json()["id"])
-----+            print(f"✅ Created reminder {i+1}/5")
-----+        else:
-----+            print(f"❌ Failed to create reminder {i+1}: {response.text}")
-----+            return False
-----+    
-----+    # Try to create 6th reminder (should fail)
-----+    reminder_data = {
-----+        "name_to_call": "Contact 6",
-----+        "phone_number": "+1234567896",
-----+        "description": "This should fail",
-----+        "date_time": (datetime.utcnow() + timedelta(hours=6)).isoformat()
-----+    }
-----+    
-----+    response = requests.post(f"{BACKEND_URL}/reminders/create", json=reminder_data, headers=headers)
-----+    if response.status_code == 403:
-----+        print("✅ 6th reminder correctly rejected (free plan limit)")
-----+        return True
-----+    else:
-----+        print(f"❌ 6th reminder should have been rejected but got: {response.status_code} - {response.text}")
-----+        return False
-----+
-----+if __name__ == "__main__":
-----+    print("Testing free user reminder limit...")
-----+    success = test_free_user_limit()
-----+    if success:
-----+        print("🎉 Free user limit test passed!")
-----+    else:
-----+        print("❌ Free user limit test failed!")
-----\ No newline at end of file
-----diff --git a/test_result.md b/test_result.md
-----index 187cba4..61d681d 100644
-------- a/test_result.md
-----+++ b/test_result.md
-----@@ -100,4 +100,114 @@
----- 
----- #====================================================================================================
----- # Testing Data - Main Agent and testing sub agent both should log testing data below this section
------#====================================================================================================
-----\ No newline at end of file
-----+#====================================================================================================
-----+
-----+user_problem_statement: "Test the CallMeBack backend API thoroughly with comprehensive endpoint testing"
-----+
-----+backend:
-----+  - task: "Health Check API"
-----+    implemented: true
-----+    working: true
-----+    file: "/app/backend/server.py"
-----+    stuck_count: 0
-----+    priority: "high"
-----+    needs_retesting: false
-----+    status_history:
-----+      - working: true
-----+        agent: "testing"
-----+        comment: "GET /api/health endpoint working correctly, returns status: healthy with timestamp"
-----+
-----+  - task: "User Authentication System"
-----+    implemented: true
-----+    working: true
-----+    file: "/app/backend/server.py"
-----+    stuck_count: 0
-----+    priority: "high"
-----+    needs_retesting: false
-----+    status_history:
-----+      - working: true
-----+        agent: "testing"
-----+        comment: "Both registration and login endpoints working. JWT token generation and validation successful. Handles existing user registration gracefully"
-----+
-----+  - task: "Reminder Management System"
-----+    implemented: true
-----+    working: true
-----+    file: "/app/backend/server.py"
-----+    stuck_count: 1
-----+    priority: "high"
-----+    needs_retesting: false
-----+    status_history:
-----+      - working: false
-----+        agent: "testing"
-----+        comment: "Initial test failed with 500 error due to ObjectId serialization issue in create_reminder response"
-----+      - working: true
-----+        agent: "testing"
-----+        comment: "Fixed ObjectId serialization issue by properly formatting datetime objects in response. All CRUD operations now working: create, list, delete reminders"
-----+
-----+  - task: "User Profile and Plan Management"
-----+    implemented: true
-----+    working: true
-----+    file: "/app/backend/server.py"
-----+    stuck_count: 0
-----+    priority: "high"
-----+    needs_retesting: false
-----+    status_history:
-----+      - working: true
-----+        agent: "testing"
-----+        comment: "User profile and plan status endpoints working correctly. Returns proper user data including plan type, expiry, and reminder count"
-----+
-----+  - task: "Payment System Integration"
-----+    implemented: true
-----+    working: true
-----+    file: "/app/backend/server.py"
-----+    stuck_count: 0
-----+    priority: "high"
-----+    needs_retesting: false
-----+    status_history:
-----+      - working: true
-----+        agent: "testing"
-----+        comment: "Payment order creation and verification working. Mock Razorpay integration functional. Plan upgrades from free to premium working correctly"
-----+
-----+  - task: "Free User Reminder Limits"
-----+    implemented: true
-----+    working: true
-----+    file: "/app/backend/server.py"
-----+    stuck_count: 0
-----+    priority: "high"
-----+    needs_retesting: false
-----+    status_history:
-----+      - working: true
-----+        agent: "testing"
-----+        comment: "Free user limit enforcement working correctly. Users can create up to 5 reminders, 6th reminder properly rejected with 403 status"
-----+
-----+  - task: "Reminder Check System"
-----+    implemented: true
-----+    working: true
-----+    file: "/app/backend/server.py"
-----+    stuck_count: 0
-----+    priority: "medium"
-----+    needs_retesting: false
-----+    status_history:
-----+      - working: true
-----+        agent: "testing"
-----+        comment: "Reminder check endpoint working, returns upcoming reminders within next minute timeframe"
-----+
-----+frontend:
-----+  # No frontend testing performed as per instructions
-----+
-----+metadata:
-----+  created_by: "testing_agent"
-----+  version: "1.0"
-----+  test_sequence: 1
-----+  run_ui: false
-----+
-----+test_plan:
-----+  current_focus:
-----+    - "All backend API endpoints tested and verified"
-----+  stuck_tasks: []
-----+  test_all: true
-----+  test_priority: "high_first"
-----+
-----+agent_communication:
-----+  - agent: "testing"
-----+    message: "Comprehensive backend API testing completed. All 12 test scenarios passed successfully. Fixed one critical ObjectId serialization issue in reminder creation. All authentication, CRUD operations, payment processing, and user limits working correctly. Backend is production-ready."
-----\ No newline at end of file
+----         <View style={styles.section}>
+----diff --git a/model.patch b/model.patch
+----index 7213120..e69de29 100644
+------- a/model.patch
+----+++ b/model.patch
+----@@ -1,221 +0,0 @@
+-----diff --git a/backend/server.py b/backend/server.py
+-----index b871bcc..ab371a1 100644
+-------- a/backend/server.py
+-----+++ b/backend/server.py
+-----@@ -263,8 +263,13 @@ async def create_reminder(reminder_data: ReminderCreate, current_user = Depends(
+-----     
+-----     return {
+-----         'id': str(result.inserted_id),
+------        **reminder_doc,
+------        'user_id': user_id
+-----+        'user_id': user_id,
+-----+        'name_to_call': reminder_doc['name_to_call'],
+-----+        'phone_number': reminder_doc['phone_number'],
+-----+        'description': reminder_doc['description'],
+-----+        'date_time': reminder_doc['date_time'].isoformat(),
+-----+        'status': reminder_doc['status'],
+-----+        'created_at': reminder_doc['created_at'].isoformat()
+-----     }
+----- 
+----- @api_router.get("/reminders/list")
+-----diff --git a/free_user_limit_test.py b/free_user_limit_test.py
+-----new file mode 100644
+-----index 0000000..4cc70a9
+-------- /dev/null
+-----+++ b/free_user_limit_test.py
+-----@@ -0,0 +1,72 @@
+-----+#!/usr/bin/env python3
+-----+"""
+-----+Test free user reminder limit (5 reminders max)
+-----+"""
+-----+
+-----+import requests
+-----+import json
+-----+from datetime import datetime, timedelta
+-----+import uuid
+-----+
+-----+BACKEND_URL = "https://reminders-app.preview.emergentagent.com/api"
+-----+
+-----+def test_free_user_limit():
+-----+    # Create a new user for this test
+-----+    user_data = {
+-----+        "name": "Free User Test",
+-----+        "email": f"freeuser{uuid.uuid4().hex[:8]}@example.com",
+-----+        "password": "test123"
+-----+    }
+-----+    
+-----+    # Register user
+-----+    response = requests.post(f"{BACKEND_URL}/auth/register", json=user_data)
+-----+    if response.status_code != 200:
+-----+        print(f"❌ Registration failed: {response.text}")
+-----+        return False
+-----+    
+-----+    token = response.json()["token"]
+-----+    headers = {"Authorization": f"Bearer {token}"}
+-----+    
+-----+    print(f"✅ Created free user: {user_data['email']}")
+-----+    
+-----+    # Create 5 reminders (should all succeed)
+-----+    reminder_ids = []
+-----+    for i in range(5):
+-----+        reminder_data = {
+-----+            "name_to_call": f"Contact {i+1}",
+-----+            "phone_number": f"+123456789{i}",
+-----+            "description": f"Test reminder {i+1}",
+-----+            "date_time": (datetime.utcnow() + timedelta(hours=i+1)).isoformat()
+-----+        }
+-----+        
+-----+        response = requests.post(f"{BACKEND_URL}/reminders/create", json=reminder_data, headers=headers)
+-----+        if response.status_code == 200:
+-----+            reminder_ids.append(response.json()["id"])
+-----+            print(f"✅ Created reminder {i+1}/5")
+-----+        else:
+-----+            print(f"❌ Failed to create reminder {i+1}: {response.text}")
+-----+            return False
+-----+    
+-----+    # Try to create 6th reminder (should fail)
+-----+    reminder_data = {
+-----+        "name_to_call": "Contact 6",
+-----+        "phone_number": "+1234567896",
+-----+        "description": "This should fail",
+-----+        "date_time": (datetime.utcnow() + timedelta(hours=6)).isoformat()
+-----+    }
+-----+    
+-----+    response = requests.post(f"{BACKEND_URL}/reminders/create", json=reminder_data, headers=headers)
+-----+    if response.status_code == 403:
+-----+        print("✅ 6th reminder correctly rejected (free plan limit)")
+-----+        return True
+-----+    else:
+-----+        print(f"❌ 6th reminder should have been rejected but got: {response.status_code} - {response.text}")
+-----+        return False
+-----+
+-----+if __name__ == "__main__":
+-----+    print("Testing free user reminder limit...")
+-----+    success = test_free_user_limit()
+-----+    if success:
+-----+        print("🎉 Free user limit test passed!")
+-----+    else:
+-----+        print("❌ Free user limit test failed!")
+-----\ No newline at end of file
+-----diff --git a/test_result.md b/test_result.md
+-----index 187cba4..61d681d 100644
+-------- a/test_result.md
+-----+++ b/test_result.md
+-----@@ -100,4 +100,114 @@
+----- 
+----- #====================================================================================================
+----- # Testing Data - Main Agent and testing sub agent both should log testing data below this section
+------#====================================================================================================
+-----\ No newline at end of file
+-----+#====================================================================================================
+-----+
+-----+user_problem_statement: "Test the CallMeBack backend API thoroughly with comprehensive endpoint testing"
+-----+
+-----+backend:
+-----+  - task: "Health Check API"
+-----+    implemented: true
+-----+    working: true
+-----+    file: "/app/backend/server.py"
+-----+    stuck_count: 0
+-----+    priority: "high"
+-----+    needs_retesting: false
+-----+    status_history:
+-----+      - working: true
+-----+        agent: "testing"
+-----+        comment: "GET /api/health endpoint working correctly, returns status: healthy with timestamp"
+-----+
+-----+  - task: "User Authentication System"
+-----+    implemented: true
+-----+    working: true
+-----+    file: "/app/backend/server.py"
+-----+    stuck_count: 0
+-----+    priority: "high"
+-----+    needs_retesting: false
+-----+    status_history:
+-----+      - working: true
+-----+        agent: "testing"
+-----+        comment: "Both registration and login endpoints working. JWT token generation and validation successful. Handles existing user registration gracefully"
+-----+
+-----+  - task: "Reminder Management System"
+-----+    implemented: true
+-----+    working: true
+-----+    file: "/app/backend/server.py"
+-----+    stuck_count: 1
+-----+    priority: "high"
+-----+    needs_retesting: false
+-----+    status_history:
+-----+      - working: false
+-----+        agent: "testing"
+-----+        comment: "Initial test failed with 500 error due to ObjectId serialization issue in create_reminder response"
+-----+      - working: true
+-----+        agent: "testing"
+-----+        comment: "Fixed ObjectId serialization issue by properly formatting datetime objects in response. All CRUD operations now working: create, list, delete reminders"
+-----+
+-----+  - task: "User Profile and Plan Management"
+-----+    implemented: true
+-----+    working: true
+-----+    file: "/app/backend/server.py"
+-----+    stuck_count: 0
+-----+    priority: "high"
+-----+    needs_retesting: false
+-----+    status_history:
+-----+      - working: true
+-----+        agent: "testing"
+-----+        comment: "User profile and plan status endpoints working correctly. Returns proper user data including plan type, expiry, and reminder count"
+-----+
+-----+  - task: "Payment System Integration"
+-----+    implemented: true
+-----+    working: true
+-----+    file: "/app/backend/server.py"
+-----+    stuck_count: 0
+-----+    priority: "high"
+-----+    needs_retesting: false
+-----+    status_history:
+-----+      - working: true
+-----+        agent: "testing"
+-----+        comment: "Payment order creation and verification working. Mock Razorpay integration functional. Plan upgrades from free to premium working correctly"
+-----+
+-----+  - task: "Free User Reminder Limits"
+-----+    implemented: true
+-----+    working: true
+-----+    file: "/app/backend/server.py"
+-----+    stuck_count: 0
+-----+    priority: "high"
+-----+    needs_retesting: false
+-----+    status_history:
+-----+      - working: true
+-----+        agent: "testing"
+-----+        comment: "Free user limit enforcement working correctly. Users can create up to 5 reminders, 6th reminder properly rejected with 403 status"
+-----+
+-----+  - task: "Reminder Check System"
+-----+    implemented: true
+-----+    working: true
+-----+    file: "/app/backend/server.py"
+-----+    stuck_count: 0
+-----+    priority: "medium"
+-----+    needs_retesting: false
+-----+    status_history:
+-----+      - working: true
+-----+        agent: "testing"
+-----+        comment: "Reminder check endpoint working, returns upcoming reminders within next minute timeframe"
+-----+
+-----+frontend:
+-----+  # No frontend testing performed as per instructions
+-----+
+-----+metadata:
+-----+  created_by: "testing_agent"
+-----+  version: "1.0"
+-----+  test_sequence: 1
+-----+  run_ui: false
+-----+
+-----+test_plan:
+-----+  current_focus:
+-----+    - "All backend API endpoints tested and verified"
+-----+  stuck_tasks: []
+-----+  test_all: true
+-----+  test_priority: "high_first"
+-----+
+-----+agent_communication:
+-----+  - agent: "testing"
+-----+    message: "Comprehensive backend API testing completed. All 12 test scenarios passed successfully. Fixed one critical ObjectId serialization issue in reminder creation. All authentication, CRUD operations, payment processing, and user limits working correctly. Backend is production-ready."
+-----\ No newline at end of file
