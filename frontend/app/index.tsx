@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
-import { View, StyleSheet, Image, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from './context/AuthContext';
 import { router } from 'expo-router';
 
