@@ -1,15 +1,19 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, HTTPException, Depends, Header
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
 from pathlib import Path
-from pydantic import BaseModel, Field
-from typing import List
+from pydantic import BaseModel, Field, EmailStr
+from typing import List, Optional
 import uuid
-from datetime import datetime
-
+from datetime import datetime, timedelta
+import bcrypt
+import jwt
+from bson import ObjectId
+import asyncio
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -19,40 +23,412 @@ mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
-# Create the main app without a prefix
-app = FastAPI()
+# JWT Settings
+JWT_SECRET = os.environ.get('JWT_SECRET', 'your-secret-key-change-in-production')
+JWT_ALGORITHM = 'HS256'
 
-# Create a router with the /api prefix
+# Create the main app
+app = FastAPI()
 api_router = APIRouter(prefix="/api")
 
+# ==================== MODELS ====================
 
-# Define Models
-class StatusCheck(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    client_name: str
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+class UserCreate(BaseModel):
+    name: str
+    email: EmailStr
+    password: str
 
-class StatusCheckCreate(BaseModel):
-    client_name: str
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
 
-# Add your routes to the router instead of directly to app
+class GoogleAuthRequest(BaseModel):
+    id_token: str
+    email: EmailStr
+    name: str
+
+class UserResponse(BaseModel):
+    id: str
+    name: str
+    email: str
+    plan_type: str
+    plan_expiry: Optional[datetime]
+    reminder_count: int
+
+class ReminderCreate(BaseModel):
+    name_to_call: str
+    phone_number: str
+    description: Optional[str] = ""
+    date_time: datetime
+
+class ReminderUpdate(BaseModel):
+    name_to_call: Optional[str]
+    phone_number: Optional[str]
+    description: Optional[str]
+    date_time: Optional[datetime]
+    status: Optional[str]
+
+class ReminderResponse(BaseModel):
+    id: str
+    user_id: str
+    name_to_call: str
+    phone_number: str
+    description: str
+    date_time: datetime
+    status: str
+    created_at: datetime
+
+class PaymentVerify(BaseModel):
+    order_id: str
+    payment_id: str
+    signature: str
+    plan_type: str  # "monthly" or "quarterly"
+
+class PaymentOrder(BaseModel):
+    amount: int
+    plan_type: str
+
+# ==================== HELPER FUNCTIONS ====================
+
+def hash_password(password: str) -> str:
+    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
+def verify_password(password: str, hashed: str) -> bool:
+    return bcrypt.checkpw(password.encode('utf-8'), hashed.encode('utf-8'))
+
+def create_token(user_id: str) -> str:
+    payload = {
+        'user_id': user_id,
+        'exp': datetime.utcnow() + timedelta(days=30)
+    }
+    return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+
+async def get_current_user(authorization: str = Header(None)):
+    if not authorization:
+        raise HTTPException(status_code=401, detail="Authorization header missing")
+    
+    try:
+        token = authorization.replace('Bearer ', '')
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        user_id = payload.get('user_id')
+        
+        user = await db.users.find_one({'_id': ObjectId(user_id)})
+        if not user:
+            raise HTTPException(status_code=401, detail="User not found")
+        
+        return user
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token expired")
+    except Exception as e:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+# ==================== AUTH ENDPOINTS ====================
+
+@api_router.post("/auth/register")
+async def register(user_data: UserCreate):
+    # Check if user exists
+    existing_user = await db.users.find_one({'email': user_data.email})
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    
+    # Create user
+    user_doc = {
+        'name': user_data.name,
+        'email': user_data.email,
+        'password_hash': hash_password(user_data.password),
+        'plan_type': 'free',
+        'plan_expiry': None,
+        'reminder_count': 0,
+        'created_at': datetime.utcnow()
+    }
+    
+    result = await db.users.insert_one(user_doc)
+    user_id = str(result.inserted_id)
+    
+    token = create_token(user_id)
+    
+    return {
+        'token': token,
+        'user': {
+            'id': user_id,
+            'name': user_data.name,
+            'email': user_data.email,
+            'plan_type': 'free',
+            'reminder_count': 0
+        }
+    }
+
+@api_router.post("/auth/login")
+async def login(user_data: UserLogin):
+    user = await db.users.find_one({'email': user_data.email})
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    
+    if not verify_password(user_data.password, user['password_hash']):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    
+    user_id = str(user['_id'])
+    token = create_token(user_id)
+    
+    return {
+        'token': token,
+        'user': {
+            'id': user_id,
+            'name': user['name'],
+            'email': user['email'],
+            'plan_type': user.get('plan_type', 'free'),
+            'plan_expiry': user.get('plan_expiry'),
+            'reminder_count': user.get('reminder_count', 0)
+        }
+    }
+
+@api_router.post("/auth/google")
+async def google_auth(auth_data: GoogleAuthRequest):
+    # Check if user exists
+    user = await db.users.find_one({'email': auth_data.email})
+    
+    if user:
+        user_id = str(user['_id'])
+    else:
+        # Create new user
+        user_doc = {
+            'name': auth_data.name,
+            'email': auth_data.email,
+            'password_hash': '',  # No password for Google auth
+            'plan_type': 'free',
+            'plan_expiry': None,
+            'reminder_count': 0,
+            'auth_provider': 'google',
+            'created_at': datetime.utcnow()
+        }
+        result = await db.users.insert_one(user_doc)
+        user_id = str(result.inserted_id)
+        user = user_doc
+    
+    token = create_token(user_id)
+    
+    return {
+        'token': token,
+        'user': {
+            'id': user_id,
+            'name': user['name'],
+            'email': user['email'],
+            'plan_type': user.get('plan_type', 'free'),
+            'plan_expiry': user.get('plan_expiry'),
+            'reminder_count': user.get('reminder_count', 0)
+        }
+    }
+
+# ==================== REMINDER ENDPOINTS ====================
+
+@api_router.post("/reminders/create")
+async def create_reminder(reminder_data: ReminderCreate, current_user = Depends(get_current_user)):
+    user_id = str(current_user['_id'])
+    
+    # Check subscription limits
+    plan_type = current_user.get('plan_type', 'free')
+    reminder_count = current_user.get('reminder_count', 0)
+    
+    if plan_type == 'free' and reminder_count >= 5:
+        raise HTTPException(status_code=403, detail="Free plan limit reached. Upgrade to premium for unlimited reminders.")
+    
+    # Check if premium plan expired
+    if plan_type == 'premium':
+        plan_expiry = current_user.get('plan_expiry')
+        if plan_expiry and plan_expiry < datetime.utcnow():
+            # Downgrade to free
+            await db.users.update_one(
+                {'_id': ObjectId(user_id)},
+                {'$set': {'plan_type': 'free'}}
+            )
+            raise HTTPException(status_code=403, detail="Premium plan expired. Please renew to create more reminders.")
+    
+    # Create reminder
+    reminder_doc = {
+        'user_id': user_id,
+        'name_to_call': reminder_data.name_to_call,
+        'phone_number': reminder_data.phone_number,
+        'description': reminder_data.description or '',
+        'date_time': reminder_data.date_time,
+        'status': 'active',
+        'created_at': datetime.utcnow()
+    }
+    
+    result = await db.reminders.insert_one(reminder_doc)
+    
+    # Increment reminder count
+    await db.users.update_one(
+        {'_id': ObjectId(user_id)},
+        {'$inc': {'reminder_count': 1}}
+    )
+    
+    return {
+        'id': str(result.inserted_id),
+        **reminder_doc,
+        'user_id': user_id
+    }
+
+@api_router.get("/reminders/list")
+async def get_reminders(current_user = Depends(get_current_user)):
+    user_id = str(current_user['_id'])
+    
+    reminders = await db.reminders.find({
+        'user_id': user_id,
+        'status': {'$in': ['active', 'triggered']}
+    }).sort('date_time', 1).to_list(100)
+    
+    return [{
+        'id': str(r['_id']),
+        'user_id': r['user_id'],
+        'name_to_call': r['name_to_call'],
+        'phone_number': r['phone_number'],
+        'description': r.get('description', ''),
+        'date_time': r['date_time'].isoformat(),
+        'status': r['status'],
+        'created_at': r['created_at'].isoformat()
+    } for r in reminders]
+
+@api_router.delete("/reminders/{reminder_id}")
+async def delete_reminder(reminder_id: str, current_user = Depends(get_current_user)):
+    user_id = str(current_user['_id'])
+    
+    reminder = await db.reminders.find_one({'_id': ObjectId(reminder_id), 'user_id': user_id})
+    if not reminder:
+        raise HTTPException(status_code=404, detail="Reminder not found")
+    
+    await db.reminders.update_one(
+        {'_id': ObjectId(reminder_id)},
+        {'$set': {'status': 'deleted'}}
+    )
+    
+    # Decrement reminder count
+    await db.users.update_one(
+        {'_id': ObjectId(user_id)},
+        {'$inc': {'reminder_count': -1}}
+    )
+    
+    return {'message': 'Reminder deleted successfully'}
+
+@api_router.get("/reminders/check")
+async def check_reminders(current_user = Depends(get_current_user)):
+    """Check for reminders that should trigger now"""
+    user_id = str(current_user['_id'])
+    current_time = datetime.utcnow()
+    
+    # Find reminders within next minute
+    reminders = await db.reminders.find({
+        'user_id': user_id,
+        'status': 'active',
+        'date_time': {
+            '$gte': current_time,
+            '$lte': current_time + timedelta(minutes=1)
+        }
+    }).to_list(10)
+    
+    return [{
+        'id': str(r['_id']),
+        'name_to_call': r['name_to_call'],
+        'phone_number': r['phone_number'],
+        'description': r.get('description', ''),
+        'date_time': r['date_time'].isoformat()
+    } for r in reminders]
+
+@api_router.post("/reminders/{reminder_id}/complete")
+async def complete_reminder(reminder_id: str, current_user = Depends(get_current_user)):
+    user_id = str(current_user['_id'])
+    
+    await db.reminders.update_one(
+        {'_id': ObjectId(reminder_id), 'user_id': user_id},
+        {'$set': {'status': 'completed'}}
+    )
+    
+    return {'message': 'Reminder completed'}
+
+# ==================== PAYMENT ENDPOINTS ====================
+
+@api_router.post("/payments/create-order")
+async def create_payment_order(order_data: PaymentOrder, current_user = Depends(get_current_user)):
+    # For now, return mock Razorpay order (user will add real keys later)
+    order_id = f"order_{uuid.uuid4().hex[:12]}"
+    
+    return {
+        'order_id': order_id,
+        'amount': order_data.amount,
+        'currency': 'INR',
+        'key': 'rzp_test_PLACEHOLDER'  # User will replace with real key
+    }
+
+@api_router.post("/payments/verify-payment")
+async def verify_payment(payment_data: PaymentVerify, current_user = Depends(get_current_user)):
+    user_id = str(current_user['_id'])
+    
+    # For now, mock verification (user will add real verification later)
+    # In production, verify signature with Razorpay
+    
+    # Calculate plan expiry
+    if payment_data.plan_type == 'monthly':
+        expiry = datetime.utcnow() + timedelta(days=30)
+    else:  # quarterly
+        expiry = datetime.utcnow() + timedelta(days=90)
+    
+    # Update user plan
+    await db.users.update_one(
+        {'_id': ObjectId(user_id)},
+        {'$set': {
+            'plan_type': 'premium',
+            'plan_expiry': expiry
+        }}
+    )
+    
+    # Store payment record
+    await db.payments.insert_one({
+        'user_id': user_id,
+        'order_id': payment_data.order_id,
+        'payment_id': payment_data.payment_id,
+        'signature': payment_data.signature,
+        'plan_type': payment_data.plan_type,
+        'expiry_date': expiry,
+        'created_at': datetime.utcnow()
+    })
+    
+    return {
+        'message': 'Payment verified successfully',
+        'plan_type': 'premium',
+        'plan_expiry': expiry.isoformat()
+    }
+
+# ==================== USER ENDPOINTS ====================
+
+@api_router.get("/user/plan-status")
+async def get_plan_status(current_user = Depends(get_current_user)):
+    return {
+        'plan_type': current_user.get('plan_type', 'free'),
+        'plan_expiry': current_user.get('plan_expiry'),
+        'reminder_count': current_user.get('reminder_count', 0)
+    }
+
+@api_router.get("/user/profile")
+async def get_profile(current_user = Depends(get_current_user)):
+    return {
+        'id': str(current_user['_id']),
+        'name': current_user['name'],
+        'email': current_user['email'],
+        'plan_type': current_user.get('plan_type', 'free'),
+        'plan_expiry': current_user.get('plan_expiry'),
+        'reminder_count': current_user.get('reminder_count', 0)
+    }
+
+# ==================== HEALTH CHECK ====================
+
 @api_router.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "CallMeBack API is running"}
 
-@api_router.post("/status", response_model=StatusCheck)
-async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.dict()
-    status_obj = StatusCheck(**status_dict)
-    _ = await db.status_checks.insert_one(status_obj.dict())
-    return status_obj
+@api_router.get("/health")
+async def health_check():
+    return {"status": "healthy", "timestamp": datetime.utcnow().isoformat()}
 
-@api_router.get("/status", response_model=List[StatusCheck])
-async def get_status_checks():
-    status_checks = await db.status_checks.find().to_list(1000)
-    return [StatusCheck(**status_check) for status_check in status_checks]
-
-# Include the router in the main app
+# Include router
 app.include_router(api_router)
 
 app.add_middleware(
